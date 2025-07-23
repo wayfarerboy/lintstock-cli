@@ -18,5 +18,5 @@ This tool is designed for analyzing and interrogating board review reports.
 
 ## Workflow
 
-1.  **Data Preparation:** The user will place Excel reports in the `data/` directory. The `npm run prepare` command is used to convert these Excel files into JSON format and save them in the `reports/` directory.
+1.  **Data Preparation:** The user will place Excel reports in the `data/` directory. The `npm run build:reports` command is used to convert these Excel files into JSON format and save them in the `reports/` directory.
 2.  **Analysis:** The user will run `npm run gemini` to start an interactive session with you. You will then answer questions based on the JSON reports in the `reports/` directory.

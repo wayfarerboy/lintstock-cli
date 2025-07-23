@@ -1,6 +1,6 @@
-const XLSX = require('xlsx');
+const ExcelJS = require('exceljs');
 const { z } = require('zod');
-const chalk = require("chalk");
+const chalk = require('chalk');
 
 // Zod schema for the spreadsheet JSON structure
 const SpreadsheetSchema = z.object({
@@ -21,17 +21,17 @@ const SpreadsheetSchema = z.object({
               comment: z.string().optional(),
               skip_reason: z.string().optional(),
               response: z.string().optional(),
-            })
+            }),
           ),
-        })
+        }),
       ),
-    })
+    }),
   ),
   respondees: z.array(
     z.object({
       name: z.string(),
       position: z.string().optional(),
-    })
+    }),
   ),
 });
 
@@ -50,7 +50,6 @@ const RAW_HEADER_MAP = {
   'Q Number': 'question_number',
   'Q No': 'question_number',
   'Q#': 'question_number',
-  // "Question": "question_text", // Removed to avoid ambiguity
   'Sub-Question': 'sub_question_text',
   'Sub Question': 'sub_question_text',
   category: 'category',
@@ -59,7 +58,6 @@ const RAW_HEADER_MAP = {
   Response: 'score',
   Comment: 'comment',
   'Skip Reason': 'skip_reason',
-  // Add more mappings as needed
 };
 const HEADER_MAP = Object.fromEntries(Object.entries(RAW_HEADER_MAP).map(([k, v]) => [normalizeHeader(k), v]));
 
@@ -79,43 +77,41 @@ function formatDateToYMD(dateStr) {
   return d.toISOString().slice(0, 10);
 }
 
-function getUnmatchedHeaders(fileContent) {
-  const workbook = XLSX.read(fileContent, { type: 'buffer' });
-  const sheetNames = workbook.SheetNames;
+async function getUnmatchedHeaders(fileContent) {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(fileContent);
   const unmatched = new Set();
-  for (let i = 1; i < sheetNames.length; i++) {
-    const sheet = workbook.Sheets[sheetNames[i]];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    if (rows.length < 1) continue;
-    const headers = rows[0];
-    for (const h of headers) {
-      if (!mapHeader(h)) {
+  workbook.worksheets.forEach((sheet, index) => {
+    if (index === 0) return; // Skip details sheet
+    const headers = sheet.getRow(1).values;
+    headers.forEach((h) => {
+      if (h && !mapHeader(h)) {
         unmatched.add(h);
       }
-    }
-  }
+    });
+  });
   return Array.from(unmatched);
 }
 
-function parseSpreadsheetBuffer(fileContent) {
-  const workbook = XLSX.read(fileContent, { type: 'buffer' });
-  const sheetNames = workbook.SheetNames;
-  if (sheetNames.length < 2) {
+async function parseSpreadsheetBuffer(fileContent) {
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.load(fileContent);
+
+  if (workbook.worksheets.length < 2) {
     throw new Error('Excel file must contain at least a details sheet and one data sheet');
   }
 
   // --- 1. Extract main details from first sheet ---
-  const detailsSheet = workbook.Sheets[sheetNames[0]];
-  const detailsRows = XLSX.utils.sheet_to_json(detailsSheet, { header: 1 });
+  const detailsSheet = workbook.worksheets[0];
   let client_name = '';
   let created_date = '';
-  for (const row of detailsRows) {
-    if (row.length < 2) continue;
-    const fieldName = row[0];
-    const value = row[1];
+  detailsSheet.eachRow((row) => {
+    const fieldName = row.getCell(1).value;
+    const value = row.getCell(2).value;
     if (fieldName === 'Client Name') client_name = value;
     if (fieldName === 'Created') created_date = formatDateToYMD(value);
-  }
+  });
+
   if (!client_name || !created_date) {
     throw new Error('Could not extract client_name or created_date from details sheet');
   }
@@ -123,22 +119,26 @@ function parseSpreadsheetBuffer(fileContent) {
   // --- 2. Process each data sheet and build reports structure ---
   const reportMap = new Map();
   const respondeeMap = new Map();
-  for (let i = 1; i < sheetNames.length; i++) {
-    const originalSheetName = sheetNames[i];
-    const report_name = originalSheetName
+
+  for (let i = 1; i < workbook.worksheets.length; i++) {
+    const sheet = workbook.worksheets[i];
+    const report_name = sheet.name
       .replace(/([a-z])([A-Z0-9])/g, '$1 $2')
       .replace(/([A-Z])([A-Z][a-z])/g, '$1 $2')
       .trim();
-    const sheet = workbook.Sheets[originalSheetName];
-    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-    if (rows.length < 2) continue;
-    const headers = rows[0].map((h) => mapHeader(h) || normalizeHeader(h));
+
+    const headerRow = sheet.getRow(1).values;
+    const headers = headerRow.map((h) => (h ? mapHeader(h) || normalizeHeader(h) : null));
+
     let lastQuestionNumber = null;
     let lastQuestionText = '';
     let lastSubQuestionText = '';
     const questionMap = new Map();
-    for (let r = 1; r < rows.length; r++) {
-      const row = rows[r];
+
+    sheet.eachRow((row, rowNumber) => {
+      if (rowNumber === 1) return; // Skip header row
+
+      const rowValues = row.values;
       let question_number = lastQuestionNumber;
       let question_text = lastQuestionText;
       let sub_question_text = lastSubQuestionText;
@@ -151,10 +151,10 @@ function parseSpreadsheetBuffer(fileContent) {
       let newQuestionText = false;
       let explicitQuestionNumber = false;
       let foundQuestionNumber = null;
-      for (let c = 0; c < headers.length; c++) {
-        const field = headers[c];
-        if (!field) continue;
-        const value = row[c];
+
+      headers.forEach((field, c) => {
+        if (!field) return;
+        const value = rowValues[c];
         if (field === 'question_number' && value !== undefined && value !== null && value !== '') {
           const parsed = Number.parseInt(value);
           if (!Number.isNaN(parsed)) {
@@ -169,11 +169,10 @@ function parseSpreadsheetBuffer(fileContent) {
           if (cleaned !== lastQuestionText) {
             question_text = cleaned;
             lastQuestionText = cleaned;
-            // If sub_question_text is present in this row, set it, else clear it
             const subIdx = headers.findIndex((h) => h === 'sub_question_text');
-            if (subIdx !== -1 && row[subIdx]) {
-              sub_question_text = row[subIdx];
-              lastSubQuestionText = row[subIdx];
+            if (subIdx !== -1 && rowValues[subIdx]) {
+              sub_question_text = rowValues[subIdx];
+              lastSubQuestionText = rowValues[subIdx];
             } else {
               sub_question_text = '';
               lastSubQuestionText = '';
@@ -200,37 +199,35 @@ function parseSpreadsheetBuffer(fileContent) {
         if (field === 'comment') comment = value || '';
         if (field === 'skip_reason') skip_reason = value || '';
         if (field === 'response' && response === '') response = value || '';
-      }
-      // Set question_number logic after parsing all columns
+      });
+
       if (newQuestionText) {
-        if (explicitQuestionNumber) {
-          question_number = foundQuestionNumber;
-          lastQuestionNumber = foundQuestionNumber;
-        } else {
-          question_number = null;
-          lastQuestionNumber = null;
-        }
+        question_number = explicitQuestionNumber ? foundQuestionNumber : null;
+        lastQuestionNumber = question_number;
       } else if (explicitQuestionNumber) {
         question_number = foundQuestionNumber;
         lastQuestionNumber = foundQuestionNumber;
       } else {
         question_number = lastQuestionNumber;
       }
+
       if (respondent && String(respondent).trim() !== '') {
         if (!respondeeMap.has(respondent)) {
           respondeeMap.set(respondent, { name: respondent, position });
         }
         const qKey = `${question_number}|${question_text}|${sub_question_text}`;
-        const questionObj = {
-          question_number: question_number ?? null,
-          question_text: question_text || '',
-          responses: [],
-        };
-        if (sub_question_text) {
-          questionObj.sub_question_text = sub_question_text;
+        if (!questionMap.has(qKey)) {
+          const questionObj = {
+            question_number: question_number ?? null,
+            question_text: question_text || '',
+            responses: [],
+          };
+          if (sub_question_text) {
+            questionObj.sub_question_text = sub_question_text;
+          }
+          questionMap.set(qKey, questionObj);
         }
-        questionMap.set(qKey, questionObj);
-        // Build response object, omitting empty fields
+
         const responseObj = { respondent };
         if (score !== undefined && score !== null && score !== '') responseObj.score = score;
         if (comment) responseObj.comment = comment;
@@ -238,33 +235,32 @@ function parseSpreadsheetBuffer(fileContent) {
         if (response) responseObj.response = response;
         questionMap.get(qKey).responses.push(responseObj);
       }
-    }
+    });
+
     reportMap.set(report_name, {
       report_name,
       questions: Array.from(questionMap.values()),
     });
   }
+
   const reports = Array.from(reportMap.values());
   const respondees = Array.from(respondeeMap.values());
   const spreadsheetJson = { client_name, created_date, reports, respondees };
-  const unmatchedHeaders = getUnmatchedHeaders(fileContent);
+
+  const unmatchedHeaders = await getUnmatchedHeaders(fileContent);
   const result = { ...spreadsheetJson };
   if (unmatchedHeaders.length > 0) {
     result.unmatchedHeaders = unmatchedHeaders;
   }
+
   SpreadsheetSchema.parse(spreadsheetJson);
   return result;
 }
 
-/**
- * Compile a summary of companies, each with a list of respondents and a list of report years.
- * @param {Array} spreadsheets - Array of parsed spreadsheet JSON objects.
- * @returns {Array} - Array of companies with respondents and report years.
- */
 function compileCompaniesSummary(spreadsheets) {
   const companies = {};
   for (const sheet of spreadsheets) {
-    const { client_name, created_date, respondees, reports } = sheet;
+    const { client_name, created_date, respondees } = sheet;
     if (!client_name) continue;
     if (!companies[client_name]) {
       companies[client_name] = { name: client_name, respondents: new Set(), years: new Set() };
@@ -274,11 +270,9 @@ function compileCompaniesSummary(spreadsheets) {
         if (r && r.name) companies[client_name].respondents.add(r.name);
       }
     }
-    // Extract year from created_date (YYYY or YYYY-MM-DD)
     const year = created_date ? String(created_date).slice(0, 4) : null;
     if (year) companies[client_name].years.add(year);
   }
-  // Convert sets to arrays
   return Object.values(companies).map((c) => ({
     name: c.name,
     respondents: Array.from(c.respondents),
@@ -286,11 +280,6 @@ function compileCompaniesSummary(spreadsheets) {
   }));
 }
 
-/**
- * Compile a summary of questions, each with the years it was used, subquestions, and their years.
- * @param {Array} spreadsheets - Array of parsed spreadsheet JSON objects.
- * @returns {Array} - Array of questions with years and subquestions.
- */
 function compileQuestionsSummary(spreadsheets) {
   const questions = {};
   for (const sheet of spreadsheets) {
@@ -316,7 +305,6 @@ function compileQuestionsSummary(spreadsheets) {
       }
     }
   }
-  // Convert sets to arrays
   return Object.values(questions).map((q) => ({
     question: q.question,
     years: Array.from(q.years).sort(),

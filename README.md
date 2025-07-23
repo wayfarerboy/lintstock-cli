@@ -53,7 +53,7 @@ Follow these steps to prepare your data and run the report analysis:
     *   Place all of your Excel report files inside this `data` directory.
     *   In your terminal window, run the data preparation script by typing the following command and pressing **Enter**:
         ```bash
-        npm run prepare
+        npm run build:reports
         ```
     *   This command will convert your Excel files into a format the tool can understand and place them in the `reports` directory.
 
