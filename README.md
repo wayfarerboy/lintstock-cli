@@ -65,6 +65,18 @@ Follow these steps to prepare your data and run the report analysis:
         ```
     *   This will start the interactive session where you can ask questions about the reports.
 
+## Viewing Generated Files
+
+To easily view the files generated in the `output/` directory, you can use the built-in web server. This is especially useful for viewing charts and reports.
+
+In your terminal, run the following command:
+
+```bash
+npm run serve
+```
+
+This will start a local server, and you can view your files by opening your web browser to [http://localhost:3000](http://localhost:3000). The server also has live-reloading, so any changes to the files in `output/` will automatically refresh your browser.
+
 You are now ready to interrogate the reports.
 
 ## License

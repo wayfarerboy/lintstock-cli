@@ -1,6 +1,6 @@
 {
   "name": "lintstock-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A tool to collate, process and contextualise data from Lintstock reports",
   "license": "SEE LICENSE IN LICENSE",
   "author": "Al Pagan <generamics@gmail.com>",
