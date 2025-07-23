@@ -19,7 +19,14 @@ All generated content, including new reports, charts, and helper scripts, will b
 Before you can use this tool, you need to have Node.js installed on your computer. Node.js is a program that allows you to run the scripts in this project.
 
 1.  **Install Node.js**:
-    *   Visit the official Node.js website: [https://nodejs.org/](https://nodejs.org/)
+    *   Paste the following code into a terminal and press **Enter**.
+        ```bash
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+        \. "$HOME/.nvm/nvm.sh"
+        nvm install 22
+        ```
+        **OR**
+    *   Visit the official Node.js website: [https://nodejs.org/en/download](https://nodejs.org/en/download)
     *   Download the **LTS** (Long Term Support) version recommended for most users.
     *   Run the downloaded installer and follow the on-screen instructions.
 
