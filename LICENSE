@@ -1,0 +1,22 @@
+Copyright (c) 2025 Lintstock. All rights reserved.
+
+This software is the proprietary property of Lintstock. Unauthorized copying, use, modification, merging, publishing, distribution, sublicensing, and/or selling of this software, or any portion of it, is strictly prohibited without the express written permission of Lintstock.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+---
+
+This project utilizes the following open-source libraries. Their use is subject to the terms and conditions of their respective licenses.
+
+**Dependencies:**
+- **chalk** (v4.1.2) - MIT License
+- **cli-progress** (v3.12.0) - MIT License
+- **xlsx** (v0.18.5) - Apache-2.0 License
+- **zod** (v4.0.5) - MIT License
+
+**Dev Dependencies:**
+- **chokidar** (v4.0.3) - MIT License
+- **connect-livereload** (v0.6.1) - MIT License
+- **express** (v5.1.0) - MIT License
+- **livereload** (v0.9.3) - MIT License
+- **marked** (v16.1.1) - MIT License

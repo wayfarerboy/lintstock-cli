@@ -1,0 +1,9 @@
+{
+  "project": {
+    "file_scan": {
+      "ignore": [
+        "!reports/*.json"
+      ]
+    }
+  }
+}

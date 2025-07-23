@@ -1,0 +1,1 @@
+This directory contains helper scripts for the project. You can use these scripts, and you can also generate new scripts and save them to the `output` directory if needed.

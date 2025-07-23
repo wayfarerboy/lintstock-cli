@@ -1,0 +1,27 @@
+{
+  "name": "lintstock-cli",
+  "version": "1.0.1",
+  "description": "A tool to collate, process and contextualise data from Lintstock reports",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Al Pagan <generamics@gmail.com>",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "gemini": "npx -y https://github.com/google-gemini/gemini-cli",
+    "prepare": "node scripts/prepare.js",
+    "serve": "node scripts/serve.js"
+  },
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "cli-progress": "^3.12.0",
+    "xlsx": "^0.18.5",
+    "zod": "^4.0.5"
+  },
+  "devDependencies": {
+    "chokidar": "^4.0.3",
+    "connect-livereload": "^0.6.1",
+    "express": "^5.1.0",
+    "livereload": "^0.9.3",
+    "marked": "^16.1.1"
+  }
+}

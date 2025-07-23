@@ -1,0 +1,7 @@
+.env
+data/*.xlsx
+reports/*
+!reports/GEMINI.md
+output/*
+!output/GEMINI.md
+node_modules/

@@ -1,0 +1,1 @@
+This directory contains documents to be used as writing style references. When asked to adopt a writing style, refer to the files in this directory.
