@@ -1,4 +1,4 @@
-# Lintstock Report Interrogation
+# Lintstock CLI
 
 This tool allows you to ask questions about the board review reports.
 
