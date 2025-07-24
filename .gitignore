@@ -13,4 +13,6 @@ context/proposals/*
 !context/proposals/GEMINI.md
 output/*
 !output/GEMINI.md
+styles/*
+!styles/GEMINI.md
 node_modules/
