@@ -1,5 +1,6 @@
 .env
-data/*.xlsx
+data/*
+!data/GEMINI.md
 reports/*
 !reports/GEMINI.md
 output/*
