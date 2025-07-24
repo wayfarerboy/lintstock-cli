@@ -9,12 +9,15 @@
   "scripts": {
     "gemini": "npx -y https://github.com/google-gemini/gemini-cli",
     "build:reports": "node scripts/prepare.js",
+    "build:proposals": "node scripts/pdf-to-markdown.js --input-dir data/proposals --output-dir context/proposals",
+    "build:surveys": "node scripts/pdf-to-markdown.js --input-dir data/surveys --output-dir context/surveys",
     "serve": "node scripts/serve.js"
   },
   "dependencies": {
     "chalk": "^4.1.2",
     "cli-progress": "^3.12.0",
     "exceljs": "^4.4.0",
+    "pdf-parse": "^1.1.1",
     "zod": "^4.0.5"
   },
   "devDependencies": {

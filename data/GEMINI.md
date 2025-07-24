@@ -1,3 +1,5 @@
-This directory contains the original report files in Excel format. These files are the source for the JSON reports located in the `reports/` directory.
+This directory contains the source data for the application, organized into subdirectories.
 
-The `npm run build:reports` command is used to process these Excel files into the JSON format required for analysis.
+- `reports/`: Contains the original report files in Excel format.
+- `surveys/`: Contains survey documents in PDF format.
+- `proposals/`: Contains proposal documents in PDF format.
