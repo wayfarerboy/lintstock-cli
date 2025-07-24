@@ -8,7 +8,7 @@ After running the `npm run gemini` command, you can interact with the tool by as
 
 You can also ask it to:
 *   **Generate new files:** Create new reports, summaries, or charts based on the data.
-*   **Adopt a writing style:** Instruct it to mimic the writing style of a document from the `styles/` directory for any generated text.
+*   **Adopt a writing style:** Instruct it to mimic the writing style of a document from the `styles/` directory for any generated text. For best results, use plain text files (.txt or .md).
 
 To provide the most accurate answers, the tool may sometimes create its own helper scripts to process the data.
 
@@ -83,8 +83,6 @@ npm run serve
 ```
 
 This will start a local server, and you can view your files by opening your web browser to [http://localhost:3000](http://localhost:3000). The server also has live-reloading, so any changes to the files in `output/` will automatically refresh your browser.
-
-You are now ready to interrogate the reports.
 
 ## License
 
