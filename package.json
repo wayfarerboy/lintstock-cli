@@ -8,6 +8,7 @@
   "main": "index.js",
   "scripts": {
     "gemini": "npx -y https://github.com/google-gemini/gemini-cli",
+    "build:all": "npm run build:reports && npm run build:proposals && npm run build:surveys",
     "build:reports": "node scripts/prepare.js",
     "build:proposals": "node scripts/pdf-to-markdown.js --input-dir data/proposals --output-dir context/proposals",
     "build:surveys": "node scripts/pdf-to-markdown.js --input-dir data/surveys --output-dir context/surveys",

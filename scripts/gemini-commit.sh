@@ -29,11 +29,18 @@ else
   tagstring=""
 fi
 
-message=$(gemini --prompt "Generate a commit message for the following changes:
+# Attempt to generate a commit message using Gemini gemini-cli
+# If it fails, echo the error and exit
+message=$(npx -y https://github.com/google-gemini/gemini-cli --prompt "Generate a commit message for the following changes:
 
 \`\`\`diff
 $diff
 \`\`\`" | sed 's/^`\x60\x60//;s/`\x60\x60$//' | sed '/^diff/d' | sed '1d;$d'
 )
+if [ $? -ne 0 ]; then
+  # Run a test prompt and gather error message from gemini-cli
+  npx -y https://github.com/google-gemini/gemini-cli --prompt "Test prompt to check Gemini CLI installation"
+  exit 1
+fi
 
 git commit -m "$message$tagstring"

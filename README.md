@@ -62,9 +62,9 @@ Follow these steps to prepare your data and run the report analysis:
     *   Place your PDF proposal files inside the `data/proposals` directory.
     *   In your terminal window, run the data preparation script by typing the following command and pressing **Enter**:
         ```bash
-        npm run build:reports
+        npm run build:app
         ```
-    *   This command will convert your Excel files into a format the tool can understand and place them in the `reports` directory.
+    *   This command will convert all data files into a format the tool can understand and place them in the relevant directory in the `context` directory.
 
 4.  **Run the Analysis:**
     *   Once the data preparation is complete, you can start the analysis tool.
@@ -72,7 +72,7 @@ Follow these steps to prepare your data and run the report analysis:
         ```bash
         npm run gemini
         ```
-    *   This will start the interactive session where you can ask questions about the reports.
+    *   This will start the interactive session where you can ask questions about the reports, surveys and proposals.
 
 ## Viewing Generated Files
 

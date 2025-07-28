@@ -17,7 +17,7 @@ async function processLocalExcelFile(localFilePath) {
 const args = process.argv.slice(2);
 let filePaths = [];
 let questionNumber = null;
-let outDir = "reports"; // Default output directory
+let outDir = "context/reports"; // Default output directory
 
 for (let i = 0; i < args.length; i++) {
 	if (args[i] === "--question") {
@@ -42,7 +42,7 @@ for (let i = 0; i < args.length; i++) {
 
 // If no file paths are provided, default to all files in the 'data' directory
 if (filePaths.length === 0) {
-	const dataDir = "data";
+	const dataDir = "data/reports";
 	try {
 		if (fs.existsSync(dataDir) && fs.statSync(dataDir).isDirectory()) {
 			const allFiles = fs.readdirSync(dataDir);
@@ -82,12 +82,12 @@ if (filePaths.length === 0) {
 }
 
 if (filePaths.length === 0) {
-	console.error(
-		chalk.red(
-			"No files to process. Please provide file paths or ensure the 'data' directory has compatible files.",
+	console.log(
+		chalk.yellow(
+			"No files to process. Please provide file paths or ensure the 'data/reports' directory has compatible files.",
 		),
 	);
-	process.exit(1);
+	process.exit(0);
 }
 
 async function main() {
